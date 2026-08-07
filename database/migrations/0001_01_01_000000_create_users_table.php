@@ -11,13 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->string('role')->default('operator'); // admin, operator, leader
+            $table->string('phone')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->string('avatar_url')->nullable();
+            $table->jsonb('metadata')->nullable();
             $table->timestamps();
         });
 
@@ -29,7 +34,7 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->foreignId('user_id')->nullable()->index(); // we can keep it as user_id or employee_id depending on how we configure the guard. Better to keep it generic or employee_id. Let's use user_id to avoid breaking Laravel default session driver if not configured properly.
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
@@ -42,7 +47,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('employees');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
